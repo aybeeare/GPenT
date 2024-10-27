@@ -1,9 +1,9 @@
 from coms import ComsClass
 from utils import *
+import ctypes
 
 if __name__ == "__main__":
 
-    #print("Aaron Steinberg!")
     baud = 115200
     timeout = 10
     #com = str(input("Enter COM Port: "))
@@ -14,5 +14,6 @@ if __name__ == "__main__":
     #Coms.cmd2()
     #rx_data_packet = Coms.ReadBufDebug()
     #rx_data_packet = Coms.ReadBuffer(bytes_expected=20)
-    Coms.stream_cam_bytes()
+    #Coms.stream_cam_bytes(total_bytes=76800,num_chunks=32)
+    Coms.stream_cam_bytes(total_bytes=118400,num_chunks=32)
     #print('RX Data: ', rx_data_packet)

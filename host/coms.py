@@ -6,7 +6,7 @@ import os
 import sys
 import csv
 from utils import *
-
+import ctypes
 
 
 
@@ -142,8 +142,8 @@ class ComsClass():
             for i in range(30):
                 heartbeat_str = i*'*'
                 sys.stdout.write(heartbeat_str) # print heartbeat signal to screen
-                sys.stdout.flush()
-                time.sleep(0.1)
+                #sys.stdout.flush()
+                time.sleep(0.5)
 
 
         start_time = time.time()
@@ -182,7 +182,9 @@ class ComsClass():
         command_packet = self.TX_SYNC + self.TX_PACKET + self.STREAM2_CMD
         self.send_command(command_packet)
 
-    def stream_cam_bytes(self):
+    def stream_cam_bytes(self, total_bytes, num_chunks):
+
+        chunk_size = total_bytes // num_chunks
 
         buf_length = self.ReadBuffer(bytes_expected=4)
         image_width = self.ReadBuffer(bytes_expected=4)
@@ -195,10 +197,10 @@ class ComsClass():
         # Total payload is 76800 bytes, PC serial buffer maxes out at 3950, send in 32 chunks of 2400 bytes
         payload_list = []
 
-        for i in list(range(32)):
+        for i in list(range(num_chunks)):
 
             #print('Bytes in Buffer Before Read: ', self.ser.inWaiting())
-            payload_chunk = self.ReadBuffer(bytes_expected=2400)
+            payload_chunk = self.ReadBuffer(bytes_expected=chunk_size)
             payload_list.append(payload_chunk)
             #print('Bytes in Buffer After Read: ', self.ser.inWaiting())
 
@@ -207,9 +209,9 @@ class ComsClass():
 
         num_bytes_missing = 0
         total_bytes = 0
-        for i in list(range(32)): # list of 32 lists, each 2400 long
+        for i in list(range(num_chunks)): # list of 32 lists, each 2400 long
 
-            for j in list(range(2400)):
+            for j in list(range(chunk_size)):
 
                 if len(payload_list[i][j]) >= 3:
                     

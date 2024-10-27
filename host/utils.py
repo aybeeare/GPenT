@@ -33,17 +33,18 @@ def bytes_to_png(filename, height, width):
     arr_flattened = [int(i,16) for i in arr_flattened.tolist()]
     image_arr = np.array(arr_flattened, dtype='uint8')
    
-    plt.hist(image_arr, bins=10)
-    plt.title("Pixel Histogram")
-    plt.xlabel("Value")
-    plt.ylabel("Frequency")
-    plt.show()
+    # plt.hist(image_arr, bins=10)
+    # plt.title("Pixel Histogram")
+    # plt.xlabel("Value")
+    # plt.ylabel("Frequency")
+    # plt.show()
     
     image_arr = image_arr.reshape((height, width)) # worked once with order default?
     
 
     image = Image.fromarray(image_arr, mode='L')
-    image.save('data.png')
+    #image.save('data.png')
+    image.save('data_cif.png')
 
     print('Image Saved!')
 
@@ -57,4 +58,8 @@ def png_to_chatgpt(png_path):
 # Call and test functions scratch pad
 
 #debug('debug_logic_analyzer.csv')
-bytes_to_png('data.csv', 240, 320)
+#bytes_to_png('data.csv', 240, 320) # QVGA
+#bytes_to_png('data.csv', 1200, 1600) # UXGA
+#bytes_to_png('data.csv', 320, 480) # HVGA
+#bytes_to_png('data.csv', 480, 640) # VGA
+bytes_to_png('data.csv', 296, 400) # CIF
