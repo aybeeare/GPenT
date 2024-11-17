@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import base64
 import requests
 
+# insert API key here as string locally
+
 def debug(filename):
 
     # Quick function that takes exported csv file from logic analyzer and decodes its message (raw bytes to english)
@@ -61,7 +63,7 @@ def png_to_chatgpt(png_path): # png_path as arg in future :)
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {key}"
+        # "Authorization": f"Bearer {key}"
     }
 
     payload = {
