@@ -2,6 +2,10 @@ import numpy as np
 import os
 from PIL import Image
 import matplotlib.pyplot as plt
+import base64
+import requests
+
+key = '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'
 
 def debug(filename):
 
@@ -41,18 +45,51 @@ def bytes_to_png(filename, height, width):
     
     image_arr = image_arr.reshape((height, width)) # worked once with order default?
     
-
+    # Return and save image, returning file path to image
     image = Image.fromarray(image_arr, mode='L')
-    #image.save('data.png')
-    image.save('data_cif.png')
+    image_str = 'data_cif.png'
+    image.save(image_str)
+    cwd = os.getcwd()
+    image_path_str = cwd + image_str
 
-    print('Image Saved!')
+    return image_path_str
 
-def png_to_chatgpt(png_path):
+def png_to_chatgpt(png_path): # png_path as arg in future :)
 
-    pass
-    answer = 0
+    #png_path = 'C:/Users/abelk/OneDrive/Desktop/Pen/GPenT/host/mc_question.png'
 
+    with open(png_path, "rb") as image_file:
+        base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {key}"
+    }
+
+    payload = {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Read this multiple choice question and give an answer as a single letter."
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{base64_image}"
+                        }
+                    }
+                ]
+            }
+        ],
+        "max_tokens": 1000
+    }
+
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+    answer = response.json()['choices'][0]['message']['content']
     return answer
 
 # Call and test functions scratch pad
@@ -62,4 +99,4 @@ def png_to_chatgpt(png_path):
 #bytes_to_png('data.csv', 1200, 1600) # UXGA
 #bytes_to_png('data.csv', 320, 480) # HVGA
 #bytes_to_png('data.csv', 480, 640) # VGA
-bytes_to_png('data.csv', 296, 400) # CIF
+png_to_chatgpt()
