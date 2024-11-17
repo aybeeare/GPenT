@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import base64
 import requests
 
-key = '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'
-
 def debug(filename):
 
     # Quick function that takes exported csv file from logic analyzer and decodes its message (raw bytes to english)
