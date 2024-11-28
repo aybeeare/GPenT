@@ -14,8 +14,14 @@ if __name__ == "__main__":
     #Coms.cmd2()
     #rx_data_packet = Coms.ReadBufDebug()
     #rx_data_packet = Coms.ReadBuffer(bytes_expected=20)
-    #Coms.stream_cam_bytes(total_bytes=76800,num_chunks=32)
+    
     Coms.stream_cam_bytes(total_bytes=118400,num_chunks=32)
     image_path_str = bytes_to_png('data.csv', 296, 400) # CIF
-    png_to_chatgpt(image_path_str)
+    #Coms.stream_cam_bytes(total_bytes=1920000,num_chunks=512)
+    #image_path_str = bytes_to_png('data.csv', 1200, 1600) # UXGA
+    #question = "Read this multiple choice question and give an answer as a single letter."
+    #question = input('Ask a question about this image to ChatGPT')
+    question = "Describe what you see in this image in as much detail as possible"
+    answer = png_to_chatgpt(image_path_str, str(question))
+    print('ChatGPT Response: ', answer)
     #print('RX Data: ', rx_data_packet)

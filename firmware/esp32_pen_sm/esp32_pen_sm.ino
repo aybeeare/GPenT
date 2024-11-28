@@ -58,8 +58,8 @@ static camera_config_t camera_config = {
   .ledc_channel = LEDC_CHANNEL_0,
 
   .pixel_format = PIXFORMAT_GRAYSCALE,//YUV422,GRAYSCALE,RGB565,JPEG e.g "PIXFORMAT_JPEG"
-  //.frame_size = FRAMESIZE_QVGA,//QQVGA/UXGA, For ESP32, do not use sizes above QVGA when not JPEG. The performance of the ESP32-S series has improved a lot, but JPEG mode always gives better frame rates.
-  .frame_size = FRAMESIZE_CIF, // 1200 x 1600
+  //.frame_size = FRAMESIZE_UXGA,//QQVGA/UXGA, For ESP32, do not use sizes above QVGA when not JPEG. The performance of the ESP32-S series has improved a lot, but JPEG mode always gives better frame rates.
+  .frame_size = FRAMESIZE_CIF, 
   .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
   .fb_count = 1, //When jpeg mode is used, if fb_count more than one, the driver will work in continuous mode.
   .grab_mode = CAMERA_GRAB_WHEN_EMPTY//CAMERA_GRAB_LATEST. Sets when buffers should be filled
@@ -146,23 +146,25 @@ else { // If successfully get frame buffer, transmit it :)
   //Serial.write((char *)(fb->buf), fb->len);
   uint8_t count = 0;
   uint8_t * tx_buf = (uint8_t *)malloc(fb->len);
+  int num_chunks = 32;
 
   if (tx_buf != NULL){
 
     memcpy(tx_buf, &(fb->buf[0]), fb->len);
 
-    for (int i = 0; i < fb->len; i = i + ((fb->len)/32)){ // >> 9 to divide by 512, UXGA, >> 5 to divide into chunks of 32
+    for (int i = 0; i < fb->len; i = i + ((fb->len)/num_chunks)){ // >> 9 to divide by 512, UXGA, >> 5 to divide into chunks of 32
       count = count + 1;
       Serial.write(0x77); // TX_SYNC
       Serial.write(0xBA); // HEADer from MCU => HOST
       //Serial.write((uint8_t *)&(count), sizeof(count));
       //Serial.write((char *)&(tx_buf[i]), sizeof(&(tx_buf[i])));
       delay(1500);
-      Serial.write((char *)&(tx_buf[i]), ((fb->len)/32)); 
+      Serial.write((char *)&(tx_buf[i]), ((fb->len)/num_chunks)); 
       delay(1500);
     }
 
     free(tx_buf);
+    esp_camera_fb_return(fb); // return fb back to driver for reuse
   }
 
   // malloc failure message

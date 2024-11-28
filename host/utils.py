@@ -4,8 +4,12 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import base64
 import requests
+import yaml
 
-# insert API key here as string locally
+with open("config.yml", "r") as ymlfile:
+    cfg = yaml.safe_load(ymlfile)
+global TOKEN
+TOKEN = cfg["TOKEN"]
 
 def debug(filename):
 
@@ -50,20 +54,21 @@ def bytes_to_png(filename, height, width):
     image_str = 'data_cif.png'
     image.save(image_str)
     cwd = os.getcwd()
-    image_path_str = cwd + image_str
+    image_path_str = cwd + '/' + image_str
 
     return image_path_str
 
-def png_to_chatgpt(png_path): # png_path as arg in future :)
+def png_to_chatgpt(png_path, question): # png_path as arg in future :)
 
     #png_path = 'C:/Users/abelk/OneDrive/Desktop/Pen/GPenT/host/mc_question.png'
+    #question = "Read this multiple choice question and give an answer as a single letter."
 
     with open(png_path, "rb") as image_file:
         base64_image = base64.b64encode(image_file.read()).decode('utf-8')
 
     headers = {
         "Content-Type": "application/json",
-        # "Authorization": f"Bearer {key}"
+        "Authorization": f"Bearer {TOKEN}"
     }
 
     payload = {
@@ -74,7 +79,7 @@ def png_to_chatgpt(png_path): # png_path as arg in future :)
                 "content": [
                     {
                         "type": "text",
-                        "text": "Read this multiple choice question and give an answer as a single letter."
+                        "text": f"{question}" 
                     },
                     {
                         "type": "image_url",
@@ -90,6 +95,7 @@ def png_to_chatgpt(png_path): # png_path as arg in future :)
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
     answer = response.json()['choices'][0]['message']['content']
+    #print('Answer: ', answer)
     return answer
 
 # Call and test functions scratch pad
@@ -99,4 +105,4 @@ def png_to_chatgpt(png_path): # png_path as arg in future :)
 #bytes_to_png('data.csv', 1200, 1600) # UXGA
 #bytes_to_png('data.csv', 320, 480) # HVGA
 #bytes_to_png('data.csv', 480, 640) # VGA
-png_to_chatgpt()
+#png_to_chatgpt(0, 0)

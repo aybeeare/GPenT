@@ -127,7 +127,7 @@ class ComsClass():
                 if self.ser.read(1).hex() == hex(int(self.RX_SYNC, 16))[2:]:
                     
                     if self.ser.read(1).hex() == hex(int(self.RX_PACKET, 16))[2:]:
-                        print('Received Frame Sync and Header!')
+                        #print('Received Frame Sync and Header!')
                         break
             
             elif (time.time() - start_time) > 50:
@@ -199,13 +199,15 @@ class ComsClass():
 
         for i in list(range(num_chunks)):
 
-            #print('Bytes in Buffer Before Read: ', self.ser.inWaiting())
+            # print('Bytes in Buffer Before Read: ', self.ser.inWaiting())
+            heartbeat_str = str((i/num_chunks)*100) + '%' + ' completed\n'
+            sys.stdout.write(heartbeat_str)
             payload_chunk = self.ReadBuffer(bytes_expected=chunk_size)
             payload_list.append(payload_chunk)
-            #print('Bytes in Buffer After Read: ', self.ser.inWaiting())
+            # print('Bytes in Buffer After Read: ', self.ser.inWaiting())
 
-        print('Payload List Length: ', len(payload_list))
-        print('Length Payload Chunk: ', len(payload_list[0]))
+        # print('Payload List Length: ', len(payload_list))
+        # print('Length Payload Chunk: ', len(payload_list[0]))
 
         num_bytes_missing = 0
         total_bytes = 0
@@ -217,7 +219,7 @@ class ComsClass():
                     
                     total_bytes += 1
 
-        print('Total Bytes: ', total_bytes) 
+        # print('Total Bytes: ', total_bytes) 
 
         transposed_list = zip(*payload_list)
         with open("data.csv", "w", newline='') as file: # TODO: Images are ODDLY ZOOMED!
