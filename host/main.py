@@ -1,6 +1,5 @@
 from coms import ComsClass
 from utils import *
-import ctypes
 
 if __name__ == "__main__":
 
@@ -22,6 +21,7 @@ if __name__ == "__main__":
     #question = "Read this multiple choice question and give an answer as a single letter."
     #question = input('Ask a question about this image to ChatGPT')
     question = "Describe what you see in this image in as much detail as possible"
-    answer = png_to_chatgpt(image_path_str, str(question))
+    answer = play_answer(question, image_path_str)
     print('ChatGPT Response: ', answer)
+    
     #print('RX Data: ', rx_data_packet)

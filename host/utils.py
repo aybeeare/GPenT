@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import base64
 import requests
 import yaml
+import pyttsx3
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.safe_load(ymlfile)
@@ -96,6 +97,23 @@ def png_to_chatgpt(png_path, question): # png_path as arg in future :)
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
     answer = response.json()['choices'][0]['message']['content']
     #print('Answer: ', answer)
+    return answer
+
+def play_answer(question, image_path_str):
+
+    answer = png_to_chatgpt(image_path_str, str(question))
+
+    engine = pyttsx3.init()
+    engine.setProperty('volume',1.0) 
+    voices = engine.getProperty('voices')
+    #engine.setProperty('voice', voices[0].id)  #changing index, changes voices. o for male
+    engine.setProperty('voice', voices[1].id)   #changing index, changes voices. 1 for female
+    rate = engine.getProperty('rate')   # getting details of current speaking rate
+    #print(rate)                        #printing current voice rate
+    engine.setProperty('rate', rate-50)     # setting up new voice rate
+    engine.say(answer)
+    engine.runAndWait()
+    
     return answer
 
 # Call and test functions scratch pad
