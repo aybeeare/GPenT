@@ -30,6 +30,7 @@ char SYNC[1];
 char HEAD[1];
 char buf[1];
 uint8_t * buf2;
+camera_fb_t * fb;
 int wee_woo;
 uint32_t size = 1;
 esp_err_t ERR_STATS;
@@ -91,33 +92,13 @@ esp_err_t camera_init(){
     return ESP_OK;
 }
 
-esp_err_t camera_capture(){
 
-//acquire a frame
-camera_fb_t * fb = esp_camera_fb_get();
+void capture_and_transmit(camera_fb_t * fb){
 
-if (!fb) { // check for NULL pointer
-    ESP_LOGE(TAG, "Camera Capture Failed");
-    Serial.write(0xDD);
-    return ESP_FAIL;
-}
-
-else { // If successfully get frame buffer, transmit it :)
-  Serial.write(0xBB);
-}
-
-//replace this with custom processing fcn
-//process_image(fb->width, fb->height, fb->format, fb->buf, fb->len);
-
-//return the frame buffer back to the driver for reuse
-esp_camera_fb_return(fb);
-return ESP_OK;
-}
-
-void capture_and_transmit(){
-
-//acquire a frame
-camera_fb_t * fb = esp_camera_fb_get();
+// flush buffer of stale data, capture image, transmit pixel bytes...
+esp_camera_fb_return(fb); // flushing
+delay(25); // does this help??
+fb = esp_camera_fb_get();
 
 if (!fb) { // check for NULL pointer
     ESP_LOGE(TAG, "Camera Capture Failed");
@@ -222,7 +203,6 @@ void setup() {
     //Serial.write(buf2, sizeof(size)); 
     //ERR_STATS = camera_init();
     delay(5000);
-    // ERR_STATS = camera_capture();
     // delay(5000);
   }
 }
@@ -264,8 +244,8 @@ void loop() {
           case 0x76: // stream bytes from camera capture
 
             // Capture image and send frame buffer
-            //ERR_STATS = camera_capture();
-            capture_and_transmit();
+            fb = esp_camera_fb_get();
+            capture_and_transmit(fb);
             break;
           
 
